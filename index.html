@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ποιος Πάροχος Ρεύματος με Συμφέρει;</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; background: #f5f5f0; color: #222; font-size: 19px; line-height: 1.65; -webkit-text-size-adjust: 100%; }
+header { background: #1a365d; color: #fff; padding: 1.8rem 1.2rem; text-align: center; }
+header h1 { font-size: 1.45rem; line-height: 1.3; }
+header .sub { color: #93c5fd; font-size: 0.9rem; margin-top: 0.3rem; }
+.container { max-width: 600px; margin: 0 auto; padding: 0 1rem 3rem; }
+.intro { background: #fff; border-radius: 14px; padding: 1rem 1.2rem; margin-top: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.intro p { font-size: 0.9rem; color: #555; line-height: 1.5; }
+.intro .intro-note { font-size: 0.75rem; color: #94a3b8; margin-top: 0.35rem; border-top: 1px solid #f0f0f0; padding-top: 0.35rem; }
+.month-tabs { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.month-tab { flex: 1; padding: 0.65rem 0.5rem; border-radius: 12px; border: 2px solid #e5e7eb; background: #fff; font-size: 0.9rem; font-weight: 700; color: #666; cursor: pointer; text-align: center; font-family: inherit; transition: all 0.15s; }
+.month-tab.active { border-color: #1a365d; background: #1a365d; color: #fff; }
+.month-tab .tab-sub { display: block; font-size: 0.7rem; font-weight: 400; margin-top: 0.1rem; }
+.month-tab.active .tab-sub { color: #93c5fd; }
+.changes-card { background: #fff; border-radius: 14px; padding: 1rem 1.1rem; margin-top: 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #1a365d; }
+.changes-card h3 { font-size: 0.95rem; color: #1a365d; margin-bottom: 0.6rem; }
+.chg-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0; border-bottom: 1px solid #f5f5f0; }
+.chg-row:last-of-type { border-bottom: none; }
+.chg-arrow { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800; flex-shrink: 0; }
+.chg-arrow.up { background: #fef2f2; color: #dc2626; }
+.chg-arrow.down { background: #f0fdf4; color: #16a34a; }
+.chg-arrow.same { background: #f8fafc; color: #94a3b8; }
+.chg-info { flex: 1; min-width: 0; }
+.chg-name { font-weight: 700; font-size: 0.88rem; }
+.chg-detail { font-size: 0.75rem; color: #666; display: block; }
+.chg-pct { font-size: 0.72rem; font-weight: 800; padding: 0.15rem 0.4rem; border-radius: 6px; flex-shrink: 0; }
+.chg-pct.up { background: #fef2f2; color: #dc2626; }
+.chg-pct.down { background: #f0fdf4; color: #16a34a; }
+.chg-bar-track { height: 6px; background: #f0f0ed; border-radius: 3px; margin-top: 0.25rem; overflow: hidden; }
+.chg-bar-fill { height: 100%; border-radius: 3px; }
+.changes-note { font-size: 0.75rem; color: #94a3b8; margin-top: 0.5rem; padding-top: 0.4rem; border-top: 1px solid #f0f0f0; }
+.chg-winners { margin-bottom: 0.6rem; }
+.chg-winner { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.5rem; border-radius: 8px; margin-bottom: 0.3rem; }
+.chg-winner:first-child { background: #f0fdf4; }
+.chg-winner:last-child { background: #eff6ff; }
+.chg-w-badge { font-weight: 800; font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 5px; flex-shrink: 0; white-space: nowrap; }
+.chg-w-badge.gp { background: #dcfce7; color: #166534; }
+.chg-w-badge.bp { background: #dbeafe; color: #1e40af; }
+.chg-w-text { font-size: 0.8rem; font-weight: 600; color: #334155; }
+.chg-w-text span { font-weight: 400; font-size: 0.75rem; color: #666; }
+.prov-toggle { margin-top: 0.35rem; border-radius: 10px; }
+.prov-toggle summary { cursor: pointer; font-size: 0.82rem; font-weight: 700; color: #2563eb; padding: 0.45rem 0.7rem; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 8px; list-style: none; text-align: center; transition: all 0.15s; }
+.prov-toggle summary:hover { background: #dbeafe; }
+.prov-toggle summary::-webkit-details-marker { display: none; }
+.prov-toggle[open] { background: #f8fafc; padding: 0.5rem 0.7rem; border-radius: 10px; border: 1px solid #e5e7eb; }
+.prov-toggle[open] summary { margin-bottom: 0.4rem; color: #1a365d; background: none; border: none; text-align: left; padding: 0; }
+.prov-desc { font-size: 0.78rem; color: #555; margin-bottom: 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px solid #e5e7eb; line-height: 1.4; }
+.prov-prog { padding: 0.35rem 0; border-bottom: 1px solid #f0f0f0; }
+.prov-prog:last-child { border-bottom: none; }
+.prov-prog-head { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0.3rem; }
+.prov-prog-badges { display: flex; align-items: center; gap: 0.3rem; overflow: hidden; min-width: 0; }
+.prov-prog-cost { font-weight: 800; font-size: 0.85rem; color: #334155; white-space: nowrap; }
+.prov-prog-detail { display: block; margin-top: 0.15rem; }
+.detail-pills { display:flex; flex-wrap:wrap; gap:0.25rem 0.3rem; align-items:center; }
+.dp { display:inline-block; font-size:0.67rem; font-weight:600; padding:0.13rem 0.5rem; border-radius:20px; white-space:nowrap; line-height:1.3; }
+.dp-rate { background:#e0f2fe; color:#0369a1; }
+.dp-pagio { background:#f0fdf4; color:#166534; }
+.dp-penalty { background:#fef2f2; color:#991b1b; }
+.dp-no-penalty { background:#ecfdf5; color:#065f46; }
+.dp-discount { background:#fef9c3; color:#92400e; }
+.dp-full-rate { background:#f5f5f5; color:#888; font-weight:400; text-decoration:line-through; }
+.prov-prog-note { display: block; font-size: 0.7rem; color: #64748b; font-style: italic; margin-top: 0.05rem; word-break: break-word; }
+.top-card .prov-toggle { padding-left: 1rem; }
+.rank-item { margin-top: 0.3rem; }
+.rank-item .prov-toggle { margin-left: 0.3rem; }
+.step { background: #fff; border-radius: 18px; padding: 1.4rem; margin-top: 1.2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+.step-num { display: inline-block; background: #1a365d; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.7rem; border-radius: 20px; margin-bottom: 0.5rem; }
+.step h2 { font-size: 1.2rem; color: #1a365d; margin-bottom: 0.5rem; }
+.step p { color: #555; font-size: 0.95rem; margin-bottom: 0.8rem; }
+.step.locked { opacity: 0.35; pointer-events: none; }
+.step.locked .step-num { background: #aaa; }
+.opts { display: flex; flex-direction: column; gap: 0.5rem; }
+.opt { display: block; width: 100%; text-align: left; background: #f7f7f5; border: 2px solid #e5e5e0; border-radius: 14px; padding: 1rem 1.1rem; cursor: pointer; font-size: 1rem; color: #222; font-family: inherit; transition: all 0.15s; }
+.opt:active { transform: scale(0.98); }
+.opt.active { border-width: 3px; }
+.opt .opt-title { font-weight: 700; font-size: 1.05rem; display: block; }
+.opt .opt-desc { font-size: 0.85rem; color: #666; margin-top: 0.15rem; display: block; }
+.kwh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.kwh-grid .opt { text-align: center; padding: 0.9rem 0.5rem; }
+.kwh-grid .opt .opt-title { font-size: 1.15rem; }
+.kwh-grid .opt:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.kwh-1 { background: #ecfdf5; border-color: #a7f3d0; }
+.kwh-1 .opt-title { color: #047857; }
+.kwh-2 { background: #f0fdf4; border-color: #86efac; }
+.kwh-2 .opt-title { color: #15803d; }
+.kwh-3 { background: #fefce8; border-color: #fde68a; }
+.kwh-3 .opt-title { color: #a16207; }
+.kwh-4 { background: #fff7ed; border-color: #fdba74; }
+.kwh-4 .opt-title { color: #c2410c; }
+.kwh-5 { background: #fef2f2; border-color: #fca5a5; }
+.kwh-5 .opt-title { color: #dc2626; }
+.kwh-grid .opt.active { border-color: #1a365d !important; background: #eef2ff !important; }
+.kwh-grid .opt.active .opt-title { color: #1a365d !important; }
+.opt-green { background: #f0fdf4 !important; border-color: #86efac !important; }
+.opt-green .opt-title { color: #166534 !important; }
+.opt-green.active { border-color: #16a34a !important; background: #dcfce7 !important; }
+.opt-yellow { background: #fefce8 !important; border-color: #fde68a !important; }
+.opt-yellow .opt-title { color: #854d0e !important; }
+.opt-yellow.active { border-color: #ca8a04 !important; background: #fef9c3 !important; }
+.opt-blue { background: #eff6ff !important; border-color: #93c5fd !important; }
+.opt-blue .opt-title { color: #1e40af !important; }
+.opt-blue.active { border-color: #2563eb !important; background: #dbeafe !important; }
+.opt-orange { background: #fff7ed !important; border-color: #fdba74 !important; opacity: 0.6; cursor: not-allowed !important; }
+.opt-orange .opt-title { color: #9a3412 !important; }
+.opt-orange .opt-desc { color: #9a3412 !important; font-size: 0.82rem; }
+.opt-soon { display: inline-block; margin-top: 0.4rem; background: #fb923c; color: #fff; font-size: 0.72rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 20px; }
+.result-area { display: none; }
+.result-area.show { display: block; }
+.top3 { margin-top: 1.2rem; }
+.top3-label { text-align: center; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #888; font-weight: 700; margin-bottom: 0.3rem; }
+.top-card { background: #fff; border-radius: 16px; padding: 1rem 1.1rem; margin-top: 0.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); position: relative; overflow: hidden; }
+.top-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; }
+.tc1::before { background: linear-gradient(180deg, #22c55e, #16a34a); }
+.tc2::before { background: linear-gradient(180deg, #60a5fa, #2563eb); }
+.tc3::before { background: linear-gradient(180deg, #fbbf24, #f59e0b); }
+.tc1 { border: 2px solid #bbf7d0; }
+.top-head { display: flex; align-items: center; gap: 0.6rem; }
+.top-badge { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: #fff; flex-shrink: 0; }
+.tc1 .top-badge { background: #16a34a; }
+.tc2 .top-badge { background: #3b82f6; }
+.tc3 .top-badge { background: #f59e0b; }
+.top-name { font-weight: 700; font-size: 1.05rem; flex: 1; color: #1a365d; }
+.top-price { font-weight: 800; font-size: 1.3rem; text-align: right; }
+.tc1 .top-price { color: #16a34a; }
+.tc2 .top-price { color: #2563eb; }
+.tc3 .top-price { color: #b45309; }
+.top-extra { font-size: 0.75rem; color: #94a3b8; display: block; text-align: right; }
+.top-detail { margin-top: 0.3rem; padding-left: 2.5rem; }
+.prog-pill { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 5px; }
+.prog-pill.gp { background: #dcfce7; color: #166534; }
+.prog-pill.yp { background: #fef9c3; color: #854d0e; }
+.prog-pill.bp { background: #dbeafe; color: #1e40af; }
+.td-rates { display: block; font-size: 0.78rem; color: #555; margin-top: 0.15rem; line-height: 1.4; }
+.td-pagio { font-size: 0.72rem; color: #94a3b8; }
+.top-phone { display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.25rem; padding-left: 2.5rem; font-size: 0.82rem; }
+.top-phone a { color: #1a365d; text-decoration: none; background: #f1f5f9; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
+.top-phone .ph-note { color: #94a3b8; font-size: 0.72rem; }
+.commit-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 0.12rem 0.4rem; border-radius: 6px; margin-left: 0.2rem; vertical-align: middle; }
+.badge-12 { background: #dbeafe; color: #1e40af; }
+.badge-18 { background: #fef3c7; color: #92400e; }
+.badge-24 { background: #fce7f3; color: #9d174d; }
+.rank-card { border-radius: 10px; padding: 0.55rem 0.7rem; display: flex; align-items: flex-start; gap: 0.5rem; position: relative; overflow: hidden; background: #f8fafc; }
+.rank-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #cbd5e1; }
+.rank-item:nth-child(even) .rank-card { background: #fff; }
+.rank-card.trap-card { background: #fef2f2 !important; }
+.rank-card.trap-card::before { background: #dc2626; }
+.rank-pos { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.7rem; flex-shrink: 0; background: #e2e8f0; color: #64748b; }
+.rank-info { flex: 1; min-width: 0; }
+.rank-name { font-weight: 600; font-size: 0.88rem; }
+.rank-name .trap-flag { color: #dc2626; font-weight: 800; }
+.rk-note { font-size: 0.72rem; color: #94a3b8; line-height: 1.3; display: block; }
+.rank-right { text-align: right; flex-shrink: 0; }
+.rank-cost { font-weight: 800; font-size: 0.92rem; color: #334155; }
+.rank-diff { font-size: 0.7rem; color: #ef4444; font-weight: 600; display: block; }
+.cost-bar { height: 4px; background: #e5e7eb; border-radius: 2px; margin-top: 3px; }
+.cost-bar-fill { height: 100%; border-radius: 2px; }
+.trap-warning { background: #fef2f2; border: 2px solid #fca5a5; border-radius: 12px; padding: 0.8rem 1rem; margin-top: 0.6rem; font-size: 0.88rem; color: #991b1b; }
+.trap-warning strong { display: block; margin-bottom: 0.15rem; }
+.tariff-tag { display: inline-block; font-size: 0.6rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 4px; vertical-align: middle; margin-right: 0.15rem; letter-spacing: 0.3px; text-transform: uppercase; }
+.tariff-tag.gt { background: #dcfce7; color: #166534; }
+.tariff-tag.yt { background: #fef9c3; color: #854d0e; }
+.tariff-tag.bt { background: #dbeafe; color: #1e40af; }
+.compare-row { margin-bottom: 0.4rem; }
+.compare-label { font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 0.15rem; }
+.compare-label .cl-sub { font-weight: 400; color: #94a3b8; font-size: 0.75rem; }
+.compare-track { background: #f0f0ed; border-radius: 10px; height: 38px; overflow: hidden; }
+.compare-fill { height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: flex-end; padding: 0 12px; font-weight: 800; font-size: 0.95rem; color: #fff; min-width: 55px; }
+.compare-fill.gbar { background: linear-gradient(90deg, #4ade80, #16a34a); }
+.compare-fill.ybar { background: linear-gradient(90deg, #fde047, #ca8a04); }
+.compare-fill.bbar { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+.comp-saving-line { font-size: 0.82rem; font-weight: 700; margin: 0.15rem 0 0.1rem; }
+.comp-saving-line.pos { color: #16a34a; }
+.comp-saving-line.zero { color: #94a3b8; }
+.compare-savings { text-align: center; font-weight: 800; font-size: 1.1rem; color: #16a34a; margin-top: 0.5rem; padding: 0.5rem; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 12px; }
+.compare-savings .cs-sub { display: block; font-size: 0.82rem; font-weight: 500; color: #555; margin-top: 0.1rem; }
+.comp-toggle { margin: 0.3rem 0 0.5rem; border-radius: 10px; }
+.comp-toggle summary { cursor: pointer; font-size: 0.84rem; font-weight: 700; color: #2563eb; padding: 0.5rem 0.7rem; background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 8px; list-style: none; text-align: center; transition: all 0.15s; }
+.comp-toggle summary:hover { background: #dbeafe; }
+.comp-toggle summary::-webkit-details-marker { display: none; }
+.comp-toggle[open] { background: #f8fafc; padding: 0.5rem 0.7rem; border-radius: 10px; border: 1px solid #e5e7eb; }
+.comp-toggle[open] summary { margin-bottom: 0.4rem; background: none; border: none; text-align: left; padding: 0; }
+.comp-divider { height: 1px; background: #e5e7eb; margin: 0.5rem 0; }
+.sc-card { border-radius: 10px; padding: 0.6rem 0.7rem; margin-top: 0.3rem; border-left: 5px solid #e5e7eb; }
+.sc-card.sc-loss { border-left-color: #dc2626; background: #fef2f2; }
+.sc-card.sc-win { border-left-color: #16a34a; background: #f0fdf4; }
+.sc-card.sc-neutral { border-left-color: #f59e0b; background: #fffbeb; }
+.sc-title { font-weight: 700; font-size: 0.85rem; color: #334155; margin-bottom: 0.15rem; }
+.sc-math { font-size: 0.78rem; color: #64748b; }
+.sc-result { font-weight: 800; font-size: 0.95rem; margin-top: 0.1rem; }
+.sc-result.loss { color: #dc2626; }
+.sc-result.win { color: #16a34a; }
+.break-even { background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 2px solid #93c5fd; border-radius: 12px; padding: 0.6rem 0.8rem; margin-top: 0.5rem; text-align: center; }
+.break-even strong { color: #1e40af; display: block; font-size: 0.95rem; }
+.break-even span { font-size: 0.82rem; color: #3b82f6; }
+.verdict { border-radius: 12px; padding: 0.8rem 1rem; margin-top: 0.6rem; font-size: 0.9rem; }
+.verdict strong { display: block; margin-bottom: 0.15rem; }
+.verdict-good { background: #f0fdf4; border: 2px solid #bbf7d0; }
+.verdict-good strong { color: #166534; }
+.verdict-meh { background: #fffbeb; border: 2px solid #fde68a; }
+.verdict-meh strong { color: #92400e; }
+.verdict-bad { background: #fef2f2; border: 2px solid #fecaca; }
+.verdict-bad strong { color: #991b1b; }
+.penalty-provider { background: #f9fafb; border-radius: 12px; padding: 0.8rem 1rem; margin-top: 0.7rem; border: 1px solid #e5e7eb; }
+.pp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+.pp-name { font-weight: 700; font-size: 0.95rem; }
+.pp-row { display: flex; justify-content: space-between; padding: 0.35rem 0; font-size: 0.85rem; border-bottom: 1px solid #f0f0f0; }
+.pp-row:last-child { border-bottom: none; }
+.pp-cost { font-weight: 700; color: #dc2626; }
+.pp-cost.free { color: #16a34a; }
+.pp-saving { font-size: 0.82rem; padding: 0.4rem 0.6rem; border-radius: 8px; margin-top: 0.4rem; }
+.pp-saving.save-pos { color: #166534; background: #f0fdf4; }
+.pp-saving.save-zero { color: #92400e; background: #fffbeb; }
+.pp-saving.save-neg { color: #991b1b; background: #fef2f2; }
+.info-tip { background: #eff6ff; border-left: 4px solid #2563eb; border-radius: 12px; padding: 0.8rem 1rem; margin-top: 0.8rem; font-size: 0.9rem; }
+.info-tip strong { color: #1e40af; display: block; margin-bottom: 0.15rem; }
+.info-box { border-radius: 14px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; }
+.info-box h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+.info-box ul { list-style: none; margin: 0; padding: 0; }
+.info-box ul li { font-size: 0.85rem; color: #444; padding: 0.25rem 0; padding-left: 1.2rem; position: relative; line-height: 1.4; }
+.info-box ul li::before { content: ''; position: absolute; left: 0; top: 0.55rem; width: 6px; height: 6px; border-radius: 50%; }
+.info-box.green-info { background: #f0fdf4; border: 2px solid #bbf7d0; }
+.info-box.green-info h3 { color: #166534; }
+.info-box.green-info ul li::before { background: #16a34a; }
+.info-box.yellow-info { background: #fefce8; border: 2px solid #fde68a; }
+.info-box.yellow-info h3 { color: #854d0e; }
+.info-box.yellow-info ul li::before { background: #ca8a04; }
+.info-box.blue-info { background: #eff6ff; border: 2px solid #bfdbfe; }
+.info-box.blue-info h3 { color: #1e40af; }
+.info-box.blue-info ul li::before { background: #2563eb; }
+.call-btn { display: block; text-align: center; background: #1a365d; color: #fff; padding: 0.75rem; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.95rem; margin-top: 0.4rem; }
+.call-btn .call-sub { display: block; font-size: 0.72rem; color: #93c5fd; font-weight: 400; }
+.pending-flag { display: inline-block; font-size: 0.6rem; background: #fef3c7; color: #92400e; border: 1px solid #fde68a; border-radius: 6px; padding: 0.1rem 0.4rem; margin-left: 0.3rem; font-weight: 600; vertical-align: middle; }
+.pending-note { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 0.6rem 0.8rem; margin-top: 0.8rem; font-size: 0.8rem; color: #78350f; line-height: 1.4; }
+.pending-note strong { color: #92400e; }
+.reset-link { display: block; text-align: center; margin-top: 1.2rem; color: #2563eb; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: underline; }
+details.src { background: #fff; border-radius: 12px; padding: 0.8rem 1rem; margin-top: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+details.src summary { cursor: pointer; font-weight: 600; font-size: 0.85rem; color: #888; }
+details.src ul { list-style: none; margin-top: 0.5rem; }
+details.src li { margin-bottom: 0.3rem; }
+details.src a { color: #2563eb; font-size: 0.8rem; text-decoration: none; }
+footer { text-align: center; padding: 1.5rem 1rem; font-size: 0.78rem; color: #aaa; }
+</style>
+</head>
+<body>
+<header>
+<h1>Ποιος Πάροχος Ρεύματος<br/>με Συμφέρει;</h1>
+<div class="sub" id="header-sub">Μάρτιος 2026 · Ελλάδα</div>
+</header>
+<div class="container">
+<div class="intro">
+<p>Βρείτε τον πιο οικονομικό πάροχο ρεύματος για εσάς σε <strong>2 απλά βήματα</strong>. Επιλέξτε πόσο ρεύμα καταναλώνετε και αν θέλετε σταθερή τιμή με δέσμευση ή ελεύθερη αλλαγή — και δείτε αμέσως ποιος σας συμφέρει, πόσα γλιτώνετε, και αν αξίζει η δέσμευση.</p>
+<div class="month-tabs">
+<button class="month-tab active" id="tab-mar" onclick="switchMonth('mar')">
+  Μάρτιος 2026
+  <span class="tab-sub">Τρέχουσες τιμές</span>
+</button>
+<button class="month-tab" id="tab-feb" onclick="switchMonth('feb')">
+  Φεβρουάριος 2026
+  <span class="tab-sub">Προηγούμενος μήνας</span>
+</button>
+</div>
+<div class="intro-note" id="intro-note">Τιμές Μαρτίου 2026 · Ενημερώνονται κάθε μήνα</div>
+</div>
+
+<div class="step" id="step1">
+<span class="step-num">Βήμα 1 από 2</span>
+<h2>Πόσο ρεύμα καίτε τον μήνα;</h2>
+<p>Κοιτάξτε τον λογαριασμό σας ή επιλέξτε κατ' εκτίμηση:</p>
+<div class="opts kwh-grid">
+  <button class="opt kwh-1" onclick="pickKwh(100)"><span class="opt-title">100 kWh</span><span class="opt-desc">Μόνος/η, μικρό σπίτι</span></button>
+  <button class="opt kwh-2" onclick="pickKwh(200)"><span class="opt-title">200 kWh</span><span class="opt-desc">Ζευγάρι</span></button>
+  <button class="opt kwh-3" onclick="pickKwh(300)"><span class="opt-title">300 kWh</span><span class="opt-desc">Μέση οικογένεια</span></button>
+  <button class="opt kwh-4" onclick="pickKwh(400)"><span class="opt-title">400 kWh</span><span class="opt-desc">Μεγάλο σπίτι / AC</span></button>
+  <button class="opt kwh-5" onclick="pickKwh(500)"><span class="opt-title">500 kWh</span><span class="opt-desc">Πολύ υψηλή</span></button>
+</div>
+</div>
+
+<div class="step locked" id="step2">
+<span class="step-num">Βήμα 2 από 2</span>
+<h2>Θέλετε δέσμευση ή όχι;</h2>
+<div class="opts">
+  <button class="opt opt-green" onclick="pickType('green')">
+    <span class="opt-title">Χωρίς δέσμευση (Πράσινο)</span>
+    <span class="opt-desc">Φεύγετε όποτε θέλετε, 0€ ρήτρα. Η τιμή αλλάζει κάθε μήνα. Πάγιο ~5€/μήνα.</span>
+  </button>
+  <button class="opt opt-blue" onclick="pickType('blue')">
+    <span class="opt-title">Σταθερή τιμή με δέσμευση (Μπλε)</span>
+    <span class="opt-desc">Κλειδωμένη τιμή, αλλά: υψηλότερο πάγιο (5-13€) και ρήτρα αν φύγετε νωρίς.</span>
+  </button>
+  <button class="opt opt-yellow" onclick="pickType('yellow')">
+    <span class="opt-title">Κυμαινόμενο με δέσμευση (Κίτρινο)</span>
+    <span class="opt-desc">Η τιμή αλλάζει κάθε μήνα. Σύμβαση 12 μηνών, χωρίς ρήτρα αποχώρησης.</span>
+  </button>
+  <button class="opt opt-orange" disabled>
+    <span class="opt-title">Δυναμικό / Ωριαίο (Πορτοκαλί)</span>
+    <span class="opt-desc">Η τιμή αλλάζει κάθε ώρα με βάση τη χονδρική αγορά. Απαιτεί έξυπνο μετρητή. Διαθέσιμο για οικιακούς από 1 Απριλίου 2026.</span>
+    <span class="opt-soon">Έρχεται Απρίλιος 2026 — μη διαθέσιμο</span>
+  </button>
+</div>
+</div>
+
+<div class="result-area" id="results">
+
+<div id="info-section"></div>
+<div id="top3-area"></div>
+<div id="ranking-area"></div>
+<div id="comparison-section" style="display:none;"></div>
+<div id="penalty-section" style="display:none;"></div>
+<div id="changes-area"></div>
+
+<div style="text-align:center;margin:1.2rem 0;">
+  <h2 style="color:#1a365d;margin-bottom:0.3rem;">Τηλεφωνήστε τώρα</h2>
+  <p style="font-size:0.88rem;color:#666;margin-bottom:0.8rem;">Η αλλαγή παρόχου είναι δωρεάν. Δεν κόβεται το ρεύμα.</p>
+  <div id="phones-list" style="display:flex;flex-direction:column;gap:0.4rem;"></div>
+  <span class="reset-link" onclick="resetAll();">↺ Αλλαγή επιλογών</span>
+</div>
+
+</div>
+
+<details class="src">
+  <summary>Πηγές πληροφοριών</summary>
+  <ul>
+    <li><a href="https://www.enikonomia.gr/my-money/logariasmoi-revmatos-fevrouariou-2026-a/672398/">enikonomia.gr — Τιμές Φεβ. 2026</a></li>
+    <li><a href="https://bestenergydeals.gr/">bestenergydeals.gr — Τιμές ανά εταιρεία</a></li>
+    <li><a href="https://invoices.rae.gr/oikiako/">ΡΑΑΕΥ — Επίσημα τιμολόγια</a></li>
+  </ul>
+</details>
+
+<footer>
+Μάρτιος 2026 · Πράσινα/Κίτρινα τιμολόγια ενημερώνονται κάθε μήνα · Μπλε τιμολόγια σταθερά
+</footer>
+</div>
+
+<script>
+var phones = {
+  'ΔΕΗ':{tel:'11770',label:'11770',note:'24ωρη εξυπηρέτηση'},
+  'ΗΡΩΝ':{tel:'18228',label:'18228',note:''},
+  'Protergia':{tel:'18311',label:'18311',note:''},
+  'Ελίν':{tel:'8004000800',label:'800 4000 800',note:'Δωρεάν κλήση'},
+  'Enerwave':{tel:'18340',label:'18340',note:''},
+  'NRG':{tel:'18101',label:'18101',note:''},
+  'Φυσ. Αέριο':{tel:'181133',label:'181133',note:'24ωρη'},
+  'Volton':{tel:'11300',label:'11300',note:''},
+  'ZeniΘ':{tel:'18321',label:'18321',note:''},
+  'EUNICE':{tel:'2111989200',label:'211 198 9200',note:''}
+};
+
+var levels=[100,200,300,400,500];
+
+var greenMar=[
+  {name:'Ελίν',costs:[14,24,33,42,51],prog:'Ειδικό',rates:'9,26λ/kWh ενιαία',pagio:'5€'},
+  {name:'EUNICE',costs:[16,26,37,47,58],prog:'Ειδικό',rates:'10,539λ/kWh ενιαία',pagio:'5€'},
+  {name:'ΔΕΗ',costs:[18,31,45,60,74],prog:'Πράσινο Γ1',rates:'12,905λ ≤200 kWh · 14,5λ >200 kWh',pagio:'5€',discount:'Εμπρόθεσμη + myΔΕΗ',ratesFull:'14,355λ ≤200 kWh · 16,22λ >200 kWh'},
+  {name:'ΗΡΩΝ',costs:[20,34,49,63,78],prog:'Basic Home',rates:'14,5λ/kWh ενιαία',pagio:'5€',pending:true},
+  {name:'Protergia',costs:[21,37,53,69,85],prog:'Value Special',rates:'15,9λ/kWh ενιαία',pagio:'5€',pending:true},
+  {name:'Enerwave',costs:[16,31,47,62,78],prog:'Ειδικό',rates:'15,574λ/kWh ενιαία',pagio:'0€'},
+  {name:'NRG',costs:[22,38,55,71,88],prog:'Energy Home',rates:'16,55λ/kWh ενιαία',pagio:'5€',discount:'Συνέπεια',ratesFull:'21,65λ/kWh'},
+  {name:'Volton',costs:[22,38,55,71,88],prog:'Ειδικό',rates:'16,623λ/kWh ενιαία',pagio:'4,90€',discount:'Συνέπεια'},
+  {name:'ZeniΘ',costs:[22,38,55,71,88],prog:'Ειδικό',rates:'16,555λ/kWh ενιαία',pagio:'5€'},
+  {name:'Φυσ. Αέριο',costs:[24,44,63,83,102],prog:'Οικιακό',rates:'19,4λ/kWh ενιαία',pagio:'5€',pending:true}
+];
+
+var greenFeb=[
+  {name:'ΔΕΗ',costs:[19,33,48,64,79],prog:'Πράσινο Γ1',rates:'13,9λ ≤200 kWh · 15,4λ >200 kWh',pagio:'5€'},
+  {name:'ΗΡΩΝ',costs:[20,35,49,64,79],prog:'Basic Home',rates:'14,8λ/kWh ενιαία',pagio:'5€'},
+  {name:'Protergia',costs:[21,37,53,69,85],prog:'Value Special',rates:'15,9λ/kWh ενιαία',pagio:'5€'},
+  {name:'Ελίν',costs:[21,38,54,71,87],prog:'Home Green',rates:'16,5λ/kWh ενιαία',pagio:'5€'},
+  {name:'Enerwave',costs:[21,45,69,93,117],prog:'Special',rates:'15,9λ ≤100 kWh · 24,2λ >100 kWh',pagio:'5€',trap:true},
+  {name:'NRG',costs:[26,47,68,89,110],prog:'Energy Home',rates:'20,9λ/kWh ενιαία',pagio:'5€'},
+  {name:'Φυσ. Αέριο',costs:[26,47,68,89,110],prog:'Οικιακό',rates:'20,9λ/kWh ενιαία',pagio:'5€'},
+  {name:'Volton',costs:[27,49,70,92,114],prog:'Green Ειδικό',rates:'21,8λ/kWh ενιαία',pagio:'4,90€'},
+  {name:'ZeniΘ',costs:[30,56,81,106,131],prog:'Power Home Start',rates:'25,3λ/kWh ενιαία',pagio:'5€'}
+];
+
+// Κίτρινα: κυμαινόμενη τιμή ΜΕ δέσμευση 12μ — χωρίς ρήτρα αποχώρησης (maxPen:0)
+// Πηγή: ΡΑΑΕΥ energycost.gr — επίσημα καταχωρημένα τιμολόγια
+var yellowMar=[
+  {name:'ΔΕΗ',costs:[15,26,36,46,57],prog:'myHome4All',rates:'10,363λ/kWh ≤500 kWh',pagio:'4,90€',months:12,maxPen:0,discount:'Πάγια εντολή',ratesFull:'10,673λ/kWh ≤500 kWh'},
+  {name:'Protergia',costs:[17,29,41,53,65],prog:'Value Pulse',rates:'11,9λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0,pending:true},
+  {name:'Enerwave',costs:[21,34,47,60,73],prog:'Reward Saver',rates:'12,99λ/kWh ενιαία',pagio:'7,90€',months:12,maxPen:0,discount:'Συνέπεια 7λ'},
+  {name:'ΗΡΩΝ',costs:[20,36,51,66,82],prog:'Yellow One Home',rates:'15,3λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0,pending:true},
+  {name:'NRG',costs:[22,38,55,71,88],prog:'Ειδικό',rates:'16,55λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0,discount:'Συνέπεια',ratesFull:'21,65λ/kWh'}
+];
+
+// Τιμές Φεβρουαρίου 2026 — επιβεβαιωμένα από ΡΑΑΕΥ
+var yellowFeb=[
+  {name:'Protergia',costs:[17,29,41,53,65],prog:'Value Pulse',rates:'11,9λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0},
+  {name:'ΔΕΗ',costs:[18,32,45,59,72],prog:'myHome4All',rates:'13,5λ/kWh ενιαία',pagio:'4,90€',months:12,maxPen:0},
+  {name:'ΗΡΩΝ',costs:[20,36,51,66,82],prog:'Yellow One Home',rates:'15,3λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0}
+];
+
+var green=greenMar;
+var yellow=yellowMar;
+var activeMonth='mar';
+
+var blue=[
+  {name:'ΔΕΗ',prog:'Enter',costs:[16,27,39,50,61],rates:'11,2λ/kWh σταθερή',pagio:'4,90€',months:12,maxPen:100},
+  {name:'Ελίν',prog:'Blue',costs:[19,28,37,46,55],rates:'9,0λ/kWh σταθερή',pagio:'9,90€',months:24,maxPen:180},
+  {name:'Protergia',prog:'Sure',costs:[19,32,44,57,69],rates:'12,4λ/kWh σταθερή',pagio:'6,90€',months:12,maxPen:100},
+  {name:'ΗΡΩΝ',prog:'Blue Generous Home 7',costs:[22,34,46,58,69],rates:'11,9λ/kWh σταθερή',pagio:'9,90€',months:12,maxPen:100},
+  {name:'NRG',prog:'Fixed',costs:[21,33,44,56,67],rates:'11,4λ/kWh σταθερή',pagio:'9,90€',months:18,maxPen:100},
+  {name:'ZeniΘ',prog:'Power Home Control+',costs:[21,33,44,56,67],rates:'11,5λ/kWh σταθερή',pagio:'9,90€',months:12,maxPen:100},
+  {name:'Φυσ. Αέριο',prog:'Home Fixed',costs:[24,38,52,66,79],rates:'13,9λ/kWh σταθερή',pagio:'9,90€',months:12,maxPen:100}
+];
+
+var selectedKwh=null,selectedType=null;
+
+function penaltyAt(mo,mx,at){return at>=mo?0:Math.round(mx*(mo-at)/mo);}
+function barColor(r){return r<=0.35?'#16a34a':r<=0.55?'#22c55e':r<=0.75?'#f59e0b':'#ef4444';}
+function fn(p){return p.prog?p.name+' '+p.prog:p.name;}
+function detailPills(p,type){
+  var h='<span class="detail-pills">';
+  h+='<span class="dp dp-rate">'+p.rates+'</span>';
+  h+='<span class="dp dp-pagio">Πάγιο '+p.pagio+'</span>';
+  if(type==='yellow')h+='<span class="dp dp-no-penalty">Χωρίς ρήτρα</span>';
+  if(type==='blue')h+='<span class="dp dp-penalty">Ρήτρα ως '+p.maxPen+'€</span>';
+  if(p.discount)h+='<span class="dp dp-discount">Έκπτωση: '+p.discount+'</span>';
+  if(p.ratesFull)h+='<span class="dp dp-full-rate">Χωρίς έκπτ: '+p.ratesFull+'</span>';
+  h+='</span>';
+  return h;
+}
+
+var provInfo={
+  'ΔΕΗ':'Ο μεγαλύτερος πάροχος στην Ελλάδα. Φθηνότερος σε πράσινο, πολύ ανταγωνιστικός σε μπλε. 24ωρη εξυπηρέτηση.',
+  'ΗΡΩΝ':'2ος μεγαλύτερος πάροχος. Σταθερά ανταγωνιστικός σε πράσινο και μπλε.',
+  'Protergia':'Θυγατρική Μυτιληναίος. Αμετάβλητες τιμές 9+ μήνες. Χαμηλό πάγιο στο μπλε (6,90€).',
+  'Ελίν':'Φθηνότερο πράσινο Μαρτίου (9,26λ). Μπλε: 9,0λ σταθερή αλλά 24μ δέσμευση.',
+  'Enerwave':'Πράσινο: 15,574λ flat με 0€ πάγιο Μάρτιο. Κίτρινο Reward Saver: 12,99λ με συνέπεια.',
+  'EUNICE':'Νέος πάροχος. Ανταγωνιστικό πράσινο 10,5λ/kWh.',
+  'NRG':'Βελτιωμένες τιμές Μαρτίου (16,55λ με συνέπεια). Μπλε δέσμευση 18 μηνών.',
+  'Φυσ. Αέριο':'Θυγατρική ΔΕΠΑ. 24ωρη εξυπηρέτηση.',
+  'Volton':'Σημαντική πτώση πράσινου Μαρτίου (16,6λ από 21,8λ). Μπλε αποσύρθηκε.',
+  'ZeniΘ':'Σημαντική πτώση πράσινου (16,6λ από 25,3λ). Μπλε Power Home Control+ σταθερό.'
+};
+
+function typeTagClass(t){return t==='green'?'gt':t==='yellow'?'yt':'bt';}
+function typePillClass(t){return t==='green'?'gp':t==='yellow'?'yp':'bp';}
+function typeLabel(t){return t==='green'?'ΠΡΑΣΙΝΟ':t==='yellow'?'ΚΙΤΡΙΝΟ':'ΜΠΛΕ';}
+function typeBarClass(t){return t==='green'?'gbar':t==='yellow'?'ybar':'bbar';}
+
+function provToggleHtml(name,idx,curType){
+  var gP=green.filter(function(p){return p.name===name;});
+  var yP=yellow.filter(function(p){return p.name===name;});
+  var bP=blue.filter(function(p){return p.name===name;});
+  if(!gP.length&&!yP.length&&!bP.length)return '';
+  var bestGAll=green.slice().sort(function(a,b){return a.costs[idx]-b.costs[idx];})[0];
+  var bestBAll=blue.slice().sort(function(a,b){return a.costs[idx]-b.costs[idx];})[0];
+  var desc=provInfo[name]||'';var ph=phones[name];
+  var totalProgs=gP.length+yP.length+bP.length;
+  var h='<details class="prov-toggle"><summary>'+name+': '+totalProgs+' πρόγραμμα'+(totalProgs>1?'τα':'')+' — Δείτε αναλυτικά ▾</summary>';
+  h+='<div class="prov-desc">'+desc+'</div>';
+  gP.forEach(function(p){
+    var note='';
+    if(curType==='green'){
+      note='<strong style="color:#16a34a">Αυτό βλέπετε τώρα</strong>';
+      var d=p.costs[idx]-bestBAll.costs[idx];if(d>0)note+=' · Μπλε '+bestBAll.name+' '+bestBAll.prog+': <strong>'+d+'€/μήνα φθηνότερο</strong> (δέσμευση '+bestBAll.months+'μ)';
+    } else {
+      note='Χωρίς δέσμευση, αλλάζετε ελεύθερα';
+      var d=p.costs[idx]-bestBAll.costs[idx];if(d>0)note+=' · '+d+'€/μήνα ακριβότερο από μπλε '+bestBAll.name;else if(d<0)note+=' · '+Math.abs(d)+'€/μήνα φθηνότερο χωρίς δέσμευση';
+    }
+    if(p.trap)note+=' · <strong style="color:#dc2626">Παγίδα τιμής >100kWh!</strong>';
+    h+='<div class="prov-prog"><div class="prov-prog-head"><span class="prov-prog-badges"><span class="tariff-tag gt">ΠΡΑΣΙΝΟ</span> <span class="prog-pill gp">'+p.prog+'</span></span><span class="prov-prog-cost">'+p.costs[idx]+'€</span></div>';
+    h+='<span class="prov-prog-detail">'+detailPills(p,'green')+'</span>';
+    h+='<span class="prov-prog-note">'+note+'</span></div>';
+  });
+  yP.forEach(function(p){
+    var bc=p.months<=12?'badge-12':p.months<=18?'badge-18':'badge-24';
+    var note='';
+    if(curType==='yellow'){
+      note='<strong style="color:#ca8a04">Αυτό βλέπετε τώρα</strong> — κυμαινόμενη τιμή, δέσμευση '+p.months+'μ';
+    } else {
+      note='Κυμαινόμενη τιμή με δέσμευση '+p.months+' μηνών';
+      var d=bestGAll.costs[idx]-p.costs[idx];if(d>0)note+=' · '+d+'€/μήνα φθηνότερο από πράσινο';else if(d<0)note+=' · '+Math.abs(d)+'€/μήνα ακριβότερο από πράσινο — δεν αξίζει η δέσμευση';
+    }
+    h+='<div class="prov-prog"><div class="prov-prog-head"><span class="prov-prog-badges"><span class="tariff-tag yt">ΚΙΤΡΙΝΟ</span> <span class="prog-pill yp">'+p.prog+'</span> <span class="commit-badge '+bc+'">'+p.months+'μ</span></span><span class="prov-prog-cost">'+p.costs[idx]+'€</span></div>';
+    h+='<span class="prov-prog-detail">'+detailPills(p,'yellow')+'</span>';
+    h+='<span class="prov-prog-note">'+note+'</span></div>';
+  });
+  bP.forEach(function(p){
+    var bc=p.months<=12?'badge-12':p.months<=18?'badge-18':'badge-24';
+    var note='';
+    if(curType==='blue'){
+      note='<strong style="color:#2563eb">Αυτό βλέπετε τώρα</strong>';
+      var d=bestGAll.costs[idx]-p.costs[idx];if(d>0)note+=' · '+d+'€/μήνα φθηνότερο από πράσινο '+bestGAll.name+' (εξοικ. '+(d*12)+'€/χρόνο)';else if(d<0)note+=' · '+Math.abs(d)+'€/μήνα ακριβότερο — πράσινο '+bestGAll.name+' συμφέρει περισσότερο';
+    } else {
+      var d=bestGAll.costs[idx]-p.costs[idx];if(d>0)note='<strong style="color:#16a34a">'+d+'€/μήνα φθηνότερο</strong> vs πράσινο '+bestGAll.name+' (εξοικ. '+(d*12)+'€/χρόνο) — δέσμευση '+p.months+'μ';else if(d<0)note='<strong style="color:#dc2626">'+Math.abs(d)+'€/μήνα ακριβότερο</strong> — δεν αξίζει η δέσμευση';else note='Ίδια τιμή — δεσμεύεστε χωρίς όφελος';
+    }
+    h+='<div class="prov-prog"><div class="prov-prog-head"><span class="prov-prog-badges"><span class="tariff-tag bt">ΜΠΛΕ</span> <span class="prog-pill bp">'+p.prog+'</span> <span class="commit-badge '+bc+'">'+p.months+'μ</span></span><span class="prov-prog-cost">'+p.costs[idx]+'€</span></div>';
+    h+='<span class="prov-prog-detail">'+detailPills(p,'blue')+'</span>';
+    h+='<span class="prov-prog-note">'+note+'</span></div>';
+  });
+  if(ph){h+='<div style="margin-top:0.35rem;padding-top:0.3rem;border-top:1px solid #e5e7eb;font-size:0.78rem;"><a href="tel:'+ph.tel+'" style="color:#1a365d;text-decoration:none;font-weight:600;">Τηλ: '+ph.label+'</a>';if(ph.note)h+=' <span style="color:#94a3b8;font-size:0.7rem;">'+ph.note+'</span>';h+='</div>';;}
+  h+='</details>';
+  return h;
+}
+
+function changesHtml(type,sorted,idx){
+  if(activeMonth!=='mar')return '';
+  if(type==='blue'||type==='yellow')return '';
+  var winner=sorted[0];
+  var h='<div class="changes-card" style="margin-top:1rem;">';
+  h+='<h3>Τι άλλαξε τον Μάρτιο;</h3>';
+  h+='<div class="chg-winners">';
+  h+='<div class="chg-winner"><span class="chg-w-badge gp">#1 ΠΡΑΣΙΝΟ</span><span class="chg-w-text">'+fn(winner)+' <span>— '+winner.costs[idx]+'€/μήνα στα '+selectedKwh+' kWh</span></span></div>';
+  h+='</div>';
+  h+='<div class="chg-row"><div class="chg-arrow down">&darr;</div><div class="chg-info"><div class="chg-name">Ελίν</div><span class="chg-detail">16,5λ &rarr; 9,26λ/kWh — Από 4η σε 1η!</span><div class="chg-bar-track"><div class="chg-bar-fill" style="width:100%;background:linear-gradient(90deg,#86efac,#16a34a)"></div></div></div><span class="chg-pct down">-44%</span></div>';
+  h+='<div class="chg-row"><div class="chg-arrow down">&darr;</div><div class="chg-info"><div class="chg-name">ZeniΘ</div><span class="chg-detail">25,3λ &rarr; 16,555λ/kWh</span><div class="chg-bar-track"><div class="chg-bar-fill" style="width:85%;background:linear-gradient(90deg,#86efac,#16a34a)"></div></div></div><span class="chg-pct down">-35%</span></div>';
+  h+='<div class="chg-row"><div class="chg-arrow down">&darr;</div><div class="chg-info"><div class="chg-name">Volton</div><span class="chg-detail">21,8λ &rarr; 16,623λ/kWh</span><div class="chg-bar-track"><div class="chg-bar-fill" style="width:65%;background:linear-gradient(90deg,#86efac,#16a34a)"></div></div></div><span class="chg-pct down">-24%</span></div>';
+  h+='<div class="chg-row"><div class="chg-arrow down">&darr;</div><div class="chg-info"><div class="chg-name">NRG</div><span class="chg-detail">20,9λ &rarr; 16,55λ/kWh (με συνέπεια)</span><div class="chg-bar-track"><div class="chg-bar-fill" style="width:55%;background:linear-gradient(90deg,#86efac,#16a34a)"></div></div></div><span class="chg-pct down">-21%</span></div>';
+  h+='<div class="chg-row"><div class="chg-arrow down">&darr;</div><div class="chg-info"><div class="chg-name">ΔΕΗ</div><span class="chg-detail">13,9λ &rarr; 12,9λ/kWh ≤200 kWh</span><div class="chg-bar-track"><div class="chg-bar-fill" style="width:35%;background:linear-gradient(90deg,#86efac,#16a34a)"></div></div></div><span class="chg-pct down">-7%</span></div>';
+  h+='<div class="chg-row"><div class="chg-arrow down">&darr;</div><div class="chg-info"><div class="chg-name">Enerwave</div><span class="chg-detail">15,9λ/24,2λ tiered &rarr; 15,574λ flat + 0€ πάγιο</span><div class="chg-bar-track"><div class="chg-bar-fill" style="width:25%;background:linear-gradient(90deg,#86efac,#16a34a)"></div></div></div><span class="chg-pct down">Νέα δομή</span></div>';
+  h+='<div class="changes-note">Νέος πάροχος: EUNICE (10,5λ). ΗΡΩΝ, Protergia, Φυσ. Αέριο δεν έχουν ανακοινώσει τιμές Μαρτίου — εμφανίζονται με τιμές Φεβρουαρίου.</div>';
+  h+='</div>';
+  return h;
+}
+
+function detailHtml(p,type){
+  var pc=typePillClass(type);
+  var h='<div class="top-detail"><span class="prog-pill '+pc+'">'+p.prog+'</span>';
+  if(p.months){var bc=p.months<=12?'badge-12':p.months<=18?'badge-18':'badge-24';h+=' <span class="commit-badge '+bc+'">'+p.months+'μ δέσμευση</span>';}
+  h+='<span class="td-rates">'+detailPills(p,type)+'</span></div>';
+  return h;
+}
+
+function scenarioHtml(sav,prov,gName){
+  if(sav<=0) return '<div style="padding:0.4rem;font-size:0.85rem;color:#666;">Ίδια ή υψηλότερη τιμή με Πράσινο '+gName+'. Πληρώνετε το ίδιο αλλά δεσμεύεστε '+prov.months+' μήνες. <strong style="color:#dc2626">Δεν αξίζει.</strong></div>';
+  var m3=3,mM=Math.floor(prov.months/2),mF=prov.months;
+  var p3=penaltyAt(prov.months,prov.maxPen,m3),pM=penaltyAt(prov.months,prov.maxPen,mM);
+  var n3=sav*m3-p3,nM=sav*mM-pM,nF=sav*mF;
+  var h='';
+  h+='<div class="sc-card '+(n3>=0?'sc-win':'sc-loss')+'"><div class="sc-title">Φεύγετε στους 3 μήνες</div><div class="sc-math">Κέρδος: '+sav+'€ x 3 = '+(sav*3)+'€ — Ρήτρα: '+p3+'€</div><div class="sc-result '+(n3>=0?'win':'loss')+'">'+(n3>=0?'+':'')+n3+'€</div></div>';
+  h+='<div class="sc-card '+(nM>=0?'sc-win':nM>-10?'sc-neutral':'sc-loss')+'"><div class="sc-title">Φεύγετε στους '+mM+' μήνες</div><div class="sc-math">Κέρδος: '+sav+'€ x '+mM+' = '+(sav*mM)+'€ — Ρήτρα: '+pM+'€</div><div class="sc-result '+(nM>=0?'win':'loss')+'">'+(nM>=0?'+':'')+nM+'€</div></div>';
+  h+='<div class="sc-card sc-win"><div class="sc-title">Μένετε '+mF+' μήνες (ολόκληρο)</div><div class="sc-math">Κέρδος: '+sav+'€ x '+mF+' = '+nF+'€ — Ρήτρα: 0€</div><div class="sc-result win">+'+nF+'€ καθαρά</div></div>';
+  var be=0;for(var m=1;m<=prov.months;m++){if(sav*m>=penaltyAt(prov.months,prov.maxPen,m)){be=m;break;}}
+  if(be>0&&be<prov.months) h+='<div class="break-even"><strong>Break-even: '+be+'ος μήνας</strong><span>Μετά τον '+be+'ο μήνα κερδίζετε ακόμα κι αν φύγετε</span></div>';
+  return h;
+}
+
+function verdictHtml(sav,months){
+  if(sav>8) return '<div class="verdict verdict-good"><strong>Αξίζει η δέσμευση!</strong>Γλιτώνετε '+(sav*12)+'€/χρόνο. Αν μπορείτε να δεσμευτείτε '+months+' μήνες, συμφέρει σαφώς.</div>';
+  if(sav>=3) return '<div class="verdict verdict-meh"><strong>Οριακά αξίζει</strong>Γλιτώνετε '+sav+'€/μήνα ('+(sav*12)+'€/χρόνο). Αξίζει μόνο αν μείνετε ως τη λήξη. Για ελευθερία αλλαγής, μείνετε Πράσινο.</div>';
+  return '<div class="verdict verdict-bad"><strong>Μείνετε Πράσινο</strong>Η διαφορά '+sav+'€/μήνα δεν δικαιολογεί δέσμευση '+months+' μηνών. Με Πράσινο αλλάζετε πάροχο ελεύθερα.</div>';
+}
+
+function pickKwh(kwh){
+  selectedKwh=kwh;selectedType=null;
+  document.querySelectorAll('#step1 .opt').forEach(function(b){b.classList.remove('active');});
+  event.currentTarget.classList.add('active');
+  document.getElementById('step2').classList.remove('locked');
+  document.querySelectorAll('#step2 .opt').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('results').classList.remove('show');
+  setTimeout(function(){document.getElementById('step2').scrollIntoView({behavior:'smooth',block:'start'});},150);
+}
+
+function pickType(type,fromSwitch){
+  selectedType=type;var idx=levels.indexOf(selectedKwh);
+  document.querySelectorAll('#step2 .opt').forEach(function(b){b.classList.remove('active');});
+  if(!fromSwitch&&event&&event.currentTarget)event.currentTarget.classList.add('active');
+  else{
+    var sel=type==='green'?'.opt-green':type==='yellow'?'.opt-yellow':'.opt-blue';
+    document.querySelector(sel).classList.add('active');
+  }
+
+  var isB=type==='blue',isY=type==='yellow';
+  var data=isB?blue:isY?yellow:green;
+
+  if(isY&&data.length===0){
+    document.getElementById('info-section').innerHTML='<div class="info-box yellow-info"><h3>Κίτρινα τιμολόγια — Σύντομα</h3><p style="font-size:0.85rem;color:#555;margin-top:0.5rem;">Τα κυμαινόμενα τιμολόγια με δέσμευση (Κίτρινα) δεν έχουν ενημερωθεί ακόμα. Επιστρέψτε σύντομα.</p></div>';
+    document.getElementById('top3-area').innerHTML='';document.getElementById('ranking-area').innerHTML='';
+    document.getElementById('changes-area').innerHTML='';document.getElementById('comparison-section').style.display='none';
+    document.getElementById('penalty-section').style.display='none';document.getElementById('phones-list').innerHTML='';
+    document.getElementById('results').classList.add('show');return;
+  }
+
+  var sorted=data.slice().sort(function(a,b){return a.costs[idx]-b.costs[idx];});
+  var winCost=sorted[0].costs[idx],maxCost=sorted[sorted.length-1].costs[idx];
+
+  // INFO SECTION
+  var infoH='';
+  if(isB){
+    infoH='<div class="info-box blue-info"><h3>Τι είναι τα Μπλε τιμολόγια;</h3><ul>';
+    infoH+='<li><strong>Σταθερή τιμή/kWh</strong> — κλειδώνετε την τιμή που βλέπετε για όλη τη διάρκεια του συμβολαίου, ανεξάρτητα από αυξήσεις στην αγορά.</li>';
+    infoH+='<li><strong>Δέσμευση 12-24 μηνών</strong> — υπογράφετε συμβόλαιο ορισμένου χρόνου με τον πάροχο.</li>';
+    infoH+='<li><strong>Ρήτρα αποχώρησης</strong> — αν φύγετε νωρίτερα, πληρώνετε ρήτρα (ξεκινά ~100€, μειώνεται γραμμικά ως 0€ στη λήξη).</li>';
+    infoH+='<li><strong>Υψηλότερο πάγιο</strong> — συνήθως 5-13€/μήνα αντί ~5€ στο πράσινο.</li>';
+    infoH+='<li><strong>Ιδανικό για</strong> — όσους θέλουν προβλεψιμότητα στον λογαριασμό και δεν σκοπεύουν να αλλάξουν πάροχο σύντομα.</li>';
+    infoH+='</ul></div>';
+  } else if(isY){
+    infoH='<div class="info-box yellow-info"><h3>Τι είναι τα Κίτρινα τιμολόγια;</h3><ul>';
+    infoH+='<li><strong>Κυμαινόμενη τιμή/kWh</strong> — η χρέωση ανά kWh ανακοινώνεται κάθε μήνα από τον πάροχο, ανάλογα με τις τιμές χονδρικής. Μπορεί να ανεβεί ή να κατεβεί.</li>';
+    infoH+='<li><strong>Επίσημο συμβόλαιο 12 μηνών — αλλά χωρίς ποινή αν φύγετε</strong> — υπογράφετε σύμβαση ορισμένης διάρκειας 12 μηνών. Αυτό όμως <em>δεν σημαίνει ότι είστε παγιδευμένοι</em>: μπορείτε να ακυρώσετε και να αλλάξετε πάροχο οποτεδήποτε χωρίς καμία επιπλέον χρέωση. Η διαφορά από το Πράσινο είναι νομική: το Κίτρινο είναι σύμβαση <em>ορισμένου</em> χρόνου, το Πράσινο <em>αορίστου</em>.</li>';
+    infoH+='<li><strong>Τι κερδίζετε από τη σύμβαση 12 μηνών;</strong> — Ο πάροχος δεσμεύεται να σας παρέχει το τιμολόγιο για 12 μήνες και δεν μπορεί να σας ακυρώσει τη σύμβαση μονομερώς. Στα Πράσινα, ο πάροχος μπορεί να τερματίσει τη σύμβαση με προειδοποίηση 30 ημερών. Επίσης, οι πάροχοι προσφέρουν συχνά καλύτερες τιμές στα Κίτρινα ως κίνητρο για "δέσμευση".</li>';
+    infoH+='<li><strong>Χαμηλό πάγιο ~5€/μήνα</strong> — ίδιο με τα Πράσινα.</li>';
+    infoH+='<li><strong>Ιδανικό για</strong> — όσους θέλουν χαμηλότερη κυμαινόμενη τιμή σε σχέση με τα Πράσινα, χωρίς το ρίσκο οικονομικής ποινής αν αλλάξουν γνώμη.</li>';
+    infoH+='</ul></div>';
+  } else {
+    infoH='<div class="info-box green-info"><h3>Τι είναι τα Πράσινα τιμολόγια;</h3><ul>';
+    infoH+='<li><strong>Μεταβλητή τιμή/kWh</strong> — η χρέωση ανά kWh μπορεί να αλλάξει κάθε μήνα ανάλογα με την αγορά ενέργειας.</li>';
+    infoH+='<li><strong>Καμία δέσμευση</strong> — δεν υπογράφετε συμβόλαιο. Μπορείτε να αλλάξετε πάροχο όποτε θέλετε, χωρίς κόστος.</li>';
+    infoH+='<li><strong>Χαμηλό πάγιο ~5€/μήνα</strong> — σταθερή μηνιαία χρέωση ανεξάρτητα από κατανάλωση.</li>';
+    infoH+='<li><strong>Μηδενική ρήτρα</strong> — αν βρείτε κάτι φθηνότερο τον επόμενο μήνα, αλλάζετε αμέσως χωρίς κόστος.</li>';
+    infoH+='<li><strong>Ιδανικό για</strong> — όσους θέλουν ελευθερία αλλαγής και παρακολουθούν τις μηνιαίες τιμές.</li>';
+    infoH+='</ul></div>';
+  }
+  document.getElementById('info-section').innerHTML=infoH;
+
+  // TOP 3
+  var tc=['tc1','tc2','tc3'];
+  var topLabel=isB?'Top 3 Σταθερά Τιμολόγια':isY?'Top 3 Κυμαινόμενα με Δέσμευση':'Top 3 Χωρίς Δέσμευση';
+  var h='<div class="top3"><div class="top3-label">'+topLabel+' · '+selectedKwh+' kWh</div>';
+  for(var t=0;t<3&&t<sorted.length;t++){
+    var p=sorted[t],diff=p.costs[idx]-winCost,ph=phones[p.name];
+    h+='<div class="top-card '+tc[t]+'"><div class="top-head"><div class="top-badge">'+(t+1)+'</div>';
+    h+='<div class="top-name">'+p.name+(p.pending?' <span class="pending-flag">τιμή Φεβ.</span>':'')+'</div>';
+    h+='<div><div class="top-price">'+p.costs[idx]+'€<span style="font-size:0.5em;font-weight:500;color:#888">/μήνα</span></div>';
+    if(diff>0)h+='<span class="top-extra">'+diff+'€ παραπάνω</span>';
+    h+='</div></div>';
+    h+=detailHtml(p,type);
+    if(ph){h+='<div class="top-phone"><a href="tel:'+ph.tel+'">Τηλ: '+ph.label+'</a>';if(ph.note)h+='<span class="ph-note">'+ph.note+'</span>';h+='</div>';}
+    h+=provToggleHtml(p.name,idx,type);
+    h+='</div>';
+  }
+  h+='</div>';
+  document.getElementById('top3-area').innerHTML=h;
+
+  // RANKING 4+
+  var rh='<div class="step" style="margin-top:1rem;"><h2>Υπόλοιποι Πάροχοι</h2>';
+  if(sorted.length>3){
+    for(var r=3;r<sorted.length;r++){
+      var rp=sorted[r],rd=rp.costs[idx]-winCost,isTrap=rp.trap&&idx>=1;
+      var cr=maxCost>winCost?(rp.costs[idx]-winCost)/(maxCost-winCost):0;
+      rh+='<div class="rank-item">';
+      rh+='<div class="rank-card'+(isTrap?' trap-card':'')+'"">';
+      rh+='<div class="rank-pos">'+(r+1)+'</div><div class="rank-info">';
+      rh+='<div class="rank-name">'+rp.name+(rp.pending?' <span class="pending-flag">τιμή Φεβ.</span>':'')+(isTrap?' <span class="trap-flag">⚠ ΠΑΓΙΔΑ</span>':'')+'</div>';
+      var ttc=typeTagClass(type),tpc=typePillClass(type);
+      rh+='<span class="rk-note"><span class="prog-pill '+tpc+'" style="font-size:0.62rem">'+rp.prog+'</span> '+detailPills(rp,type)+'</span>';
+      rh+='<div class="cost-bar"><div class="cost-bar-fill" style="width:'+Math.round(rp.costs[idx]/maxCost*100)+'%;background:'+barColor(cr)+'"></div></div>';
+      rh+='</div><div class="rank-right"><div class="rank-cost">'+rp.costs[idx]+'€</div><span class="rank-diff">'+rd+'€ ακριβότερο</span></div></div>';
+      rh+=provToggleHtml(rp.name,idx,type);
+      rh+='</div>';
+    }
+  } else {
+    rh+='<p style="font-size:0.88rem;color:#888;">Μόνο '+sorted.length+' πάροχοι σε αυτή την κατηγορία.</p>';
+  }
+  var hasTrap=false;sorted.forEach(function(s){if(s.trap&&idx>=1)hasTrap=true;});
+  if(hasTrap){var ew=sorted.find(function(s){return s.trap;});rh+='<div class="trap-warning"><strong>⚠ Γιατί η Enerwave είναι παγίδα;</strong>Χρεώνει 15,9λ/kWh μόνο ≤100 kWh. Πάνω από 100 kWh <strong>σχεδόν διπλασιάζεται στα 24,2λ</strong>. Στα '+selectedKwh+' kWh: <strong>'+ew.costs[idx]+'€ ('+(ew.costs[idx]-winCost)+'€ ακριβότερο)</strong>.</div>';}
+  var hasPending=false;sorted.forEach(function(s){if(s.pending)hasPending=true;});
+  if(hasPending&&activeMonth==='mar'&&!isB){
+    var pendingNote=isY
+      ?'<div class="pending-note"><strong>ΔΕΗ και ΗΡΩΝ Κίτρινο</strong>: Οι τιμές Μαρτίου δεν έχουν επιβεβαιωθεί πλήρως. Εμφανίζονται εκτιμώμενες τιμές βάσει μηνιαίας ανακοίνωσης. Επιπλέον πάροχοι με κίτρινα τιμολόγια θα προστεθούν σύντομα.</div>'
+      :'<div class="pending-note"><strong>Volton και Enerwave</strong> δεν έχουν δημοσιεύσει τιμές Μαρτίου ακόμα (νομική υποχρέωση: 1η κάθε μήνα). Εμφανίζονται με τις επιβεβαιωμένες τιμές Φεβρουαρίου. Θα ενημερωθούν μόλις ανακοινωθούν.</div>';
+    rh+=pendingNote;
+  }
+  rh+='</div>';
+  document.getElementById('ranking-area').innerHTML=rh;
+
+  // COMPARISON
+  var cs=document.getElementById('comparison-section');
+  var gS=green.slice().sort(function(a,b){return a.costs[idx]-b.costs[idx];});
+  var bS=blue.slice().sort(function(a,b){return a.costs[idx]-b.costs[idx];});
+  var bestG=gS[0],bestB=bS[0];
+  var ch='<div class="step" style="margin-top:1rem;">';
+  if(type==='green'){
+    var gC=winCost;
+    ch+='<h2>Θα γλιτώνατε με Μπλε τιμολόγιο;</h2>';
+    ch+='<p style="font-size:0.88rem;color:#555;">Τώρα πληρώνετε Πράσινο (χωρίς δέσμευση). Δείτε αν αξίζει να κλειδώσετε σταθερή τιμή:</p>';
+    ch+='<div class="compare-row"><div class="compare-label"><span class="tariff-tag gt">ΠΡΑΣΙΝΟ</span> '+sorted[0].name+' · '+sorted[0].prog+' <span class="cl-sub">— χωρίς δέσμευση</span></div>';
+    ch+='<div class="compare-track"><div class="compare-fill gbar" style="width:100%">'+gC+'€</div></div></div>';
+    ch+='<div style="font-size:0.82rem;color:#888;font-weight:600;margin:0.5rem 0 0.3rem;">Μπλε εναλλακτικές (σταθερή τιμή, με δέσμευση):</div>';
+    var top3b=bS.slice(0,3);
+    for(var bi=0;bi<top3b.length;bi++){
+      var bp=top3b[bi],bC=bp.costs[idx],bSav=gC-bC;
+      var bPct=Math.max(Math.round(bC/gC*100),40);
+      var bbc=bp.months<=12?'badge-12':bp.months<=18?'badge-18':'badge-24';
+      ch+='<div class="compare-row"><div class="compare-label"><span class="tariff-tag bt">ΜΠΛΕ</span> '+fn(bp)+' <span class="commit-badge '+bbc+'">'+bp.months+'μ</span></div>';
+      ch+='<div class="compare-track"><div class="compare-fill bbar" style="width:'+bPct+'%">'+bC+'€</div></div>';
+      if(bSav>0) ch+='<div class="comp-saving-line pos">Γλιτώνετε '+bSav+'€/μήνα = '+(bSav*12)+'€/χρόνο</div>';
+      else ch+='<div class="comp-saving-line zero">Ίδια τιμή — δεσμεύεστε χωρίς όφελος</div>';
+      ch+='</div>';
+      var tl=bSav>0?'Αξίζει η δέσμευση; Δείτε σενάρια ▾':'Γιατί δεν αξίζει; ▾';
+      ch+='<details class="comp-toggle"><summary>'+tl+'</summary>'+scenarioHtml(bSav,bp,sorted[0].name)+'</details>';
+      if(bi<top3b.length-1) ch+='<div class="comp-divider"></div>';
+    }
+    var topSav=gC-bestB.costs[idx];
+    ch+=verdictHtml(topSav,bestB.months);
+  } else if(type==='yellow'){
+    // Yellow: compare vs green (no commitment)
+    var yC=winCost,gC=bestG.costs[idx],ySav=gC-yC;
+    var mxC=Math.max(gC,yC),winner=sorted[0];
+    ch+='<h2>Πόσα γλιτώνετε με Κίτρινο;</h2>';
+    ch+='<p style="font-size:0.88rem;color:#555;">Σύγκριση με το φθηνότερο Πράσινο (μεταβλητή τιμή, χωρίς δέσμευση):</p>';
+    ch+='<div class="compare-row"><div class="compare-label"><span class="tariff-tag gt">ΠΡΑΣΙΝΟ</span> '+bestG.name+' · '+bestG.prog+' <span class="cl-sub">— χωρίς δέσμευση</span></div>';
+    ch+='<div class="compare-track"><div class="compare-fill gbar" style="width:'+Math.round(gC/mxC*100)+'%">'+gC+'€</div></div></div>';
+    var ywbc=winner.months<=12?'badge-12':winner.months<=18?'badge-18':'badge-24';
+    ch+='<div class="compare-row"><div class="compare-label"><span class="tariff-tag yt">ΚΙΤΡΙΝΟ</span> '+fn(winner)+' <span class="commit-badge '+ywbc+'">'+winner.months+'μ</span> <span class="cl-sub">— κυμαινόμενη τιμή</span></div>';
+    ch+='<div class="compare-track"><div class="compare-fill ybar" style="width:'+Math.round(yC/mxC*100)+'%">'+yC+'€</div></div></div>';
+    if(ySav>0){
+      ch+='<div class="compare-savings" style="background:linear-gradient(135deg,#fefce8,#fef9c3);color:#854d0e;">'+ySav+'€/μήνα = '+(ySav*12)+'€/χρόνο εξοικονόμηση<span class="cs-sub">Κίτρινο '+fn(winner)+' αντί Πράσινο '+bestG.name+'</span></div>';
+      ch+=verdictHtml(ySav,winner.months);
+      ch+='<details class="comp-toggle" style="margin-top:0.5rem"><summary>Δείτε αναλυτικά τα σενάρια αποχώρησης ▾</summary>';
+      ch+=scenarioHtml(ySav,winner,bestG.name);
+      ch+='</details>';
+    } else {
+      ch+='<div class="verdict verdict-bad"><strong>Δεν αξίζει η δέσμευση</strong>Το Κίτρινο δεν είναι φθηνότερο από το Πράσινο '+bestG.name+'. Μείνετε Πράσινο για ελευθερία αλλαγής.</div>';
+    }
+  } else {
+    // BLUE SELECTED
+    var bC2=winCost,gC2=bestG.costs[idx],sD=gC2-bC2;
+    var mxC=Math.max(gC2,bC2),winner=sorted[0];
+    ch+='<h2>Πόσα γλιτώνετε με Μπλε;</h2>';
+    ch+='<p style="font-size:0.88rem;color:#555;">Σύγκριση με το φθηνότερο Πράσινο (μεταβλητή τιμή, χωρίς δέσμευση):</p>';
+    ch+='<div class="compare-row"><div class="compare-label"><span class="tariff-tag gt">ΠΡΑΣΙΝΟ</span> '+bestG.name+' · '+bestG.prog+' <span class="cl-sub">— χωρίς δέσμευση</span></div>';
+    ch+='<div class="compare-track"><div class="compare-fill gbar" style="width:'+Math.round(gC2/mxC*100)+'%">'+gC2+'€</div></div></div>';
+    var wbc=winner.months<=12?'badge-12':winner.months<=18?'badge-18':'badge-24';
+    ch+='<div class="compare-row"><div class="compare-label"><span class="tariff-tag bt">ΜΠΛΕ</span> '+fn(winner)+' <span class="commit-badge '+wbc+'">'+winner.months+'μ</span> <span class="cl-sub">— σταθερή τιμή</span></div>';
+    ch+='<div class="compare-track"><div class="compare-fill bbar" style="width:'+Math.round(bC2/mxC*100)+'%">'+bC2+'€</div></div></div>';
+    ch+='<div class="compare-savings">'+sD+'€/μήνα = '+(sD*12)+'€/χρόνο εξοικονόμηση<span class="cs-sub">Μπλε '+fn(winner)+' αντί Πράσινο '+bestG.name+'</span></div>';
+    ch+=verdictHtml(sD,winner.months);
+    ch+='<details class="comp-toggle" style="margin-top:0.5rem"><summary>Δείτε αναλυτικά τα σενάρια αποχώρησης ▾</summary>';
+    ch+='<p style="font-size:0.85rem;color:#555;margin-bottom:0.4rem;">Με '+fn(winner)+' κλειδώνετε '+winner.rates+' για '+winner.months+' μήνες. Αν φύγετε πριν τη λήξη, πληρώνετε ρήτρα:</p>';
+    ch+=scenarioHtml(sD,winner,bestG.name);
+    ch+='</details>';
+  }
+  ch+='</div>';
+  cs.innerHTML=ch;cs.style.display='block';
+
+  // PENALTIES (blue and yellow with commitment)
+  var ps=document.getElementById('penalty-section');
+  if(type==='blue'||type==='yellow'){
+    var ph2='<div class="step" style="margin-top:1rem;"><h2>Ρήτρες Αποχώρησης — Αναλυτικά</h2>';
+    ph2+='<p style="font-size:0.92rem;color:#555;">Αν αλλάξετε πάροχο πριν τη λήξη:</p>';
+    sorted.forEach(function(bp){
+      var bc=bp.months<=12?'badge-12':bp.months<=18?'badge-18':'badge-24';
+      var kp=[];
+      if(bp.months<=12) kp=[{l:'1ο μήνα',m:1},{l:'3ο μήνα',m:3},{l:'6ο μήνα',m:6},{l:'9ο μήνα',m:9},{l:bp.months+'ο μήνα (λήξη)',m:bp.months}];
+      else if(bp.months<=18) kp=[{l:'1ο μήνα',m:1},{l:'3ο μήνα',m:3},{l:'6ο μήνα',m:6},{l:'12ο μήνα',m:12},{l:bp.months+'ο μήνα (λήξη)',m:bp.months}];
+      else kp=[{l:'1ο μήνα',m:1},{l:'3ο μήνα',m:3},{l:'6ο μήνα',m:6},{l:'12ο μήνα',m:12},{l:'18ο μήνα',m:18},{l:bp.months+'ο μήνα (λήξη)',m:bp.months}];
+      var sh='';kp.forEach(function(k){var pen=penaltyAt(bp.months,bp.maxPen,k.m);sh+='<div class="pp-row"><span>Αν φύγετε τον '+k.l+'</span><span class="pp-cost'+(pen===0?' free':'')+'">'+(pen===0?'0€ — Ελεύθεροι!':'~'+pen+'€')+'</span></div>';});
+      var sv=bestG.costs[idx]-bp.costs[idx];
+      var svh='';
+      if(sv>0){svh='<div class="pp-saving save-pos">Γλιτώνετε '+sv+'€/μήνα vs πράσινο '+bestG.name+'. Σε '+bp.months+' μήνες: <strong>+'+(sv*bp.months)+'€</strong> καθαρά.</div>';}
+      else if(sv===0){svh='<div class="pp-saving save-zero">Ίδια τιμή με πράσινο '+bestG.name+'. Δεσμεύεστε '+bp.months+' μήνες χωρίς εξοικονόμηση.</div>';}
+      else{svh='<div class="pp-saving save-neg">'+Math.abs(sv)+'€/μήνα ακριβότερο από πράσινο '+bestG.name+'. Δεν συμφέρει.</div>';}
+      ph2+='<div class="penalty-provider"><div class="pp-header"><span class="pp-name">'+fn(bp)+'</span><span class="commit-badge '+bc+'">'+bp.months+' μήνες</span></div><div>'+sh+'</div>'+svh+'</div>';
+    });
+    ph2+='<div class="info-tip"><strong>Πώς λειτουργεί η ρήτρα;</strong>Ξεκινά ~100€ και μειώνεται γραμμικά ως 0€ στη λήξη. Στο μισό του συμβολαίου ≈ 50€.</div></div>';
+    ps.innerHTML=ph2;ps.style.display='block';
+  } else {ps.style.display='none';}
+
+  // CHANGES
+  document.getElementById('changes-area').innerHTML=changesHtml(type,sorted,idx);
+
+  // PHONES
+  var pl=document.getElementById('phones-list');pl.innerHTML='';
+  sorted.forEach(function(pp,i){
+    var pph=phones[pp.name];if(pph){var a=document.createElement('a');a.className='call-btn';a.href='tel:'+pph.tel;
+    a.innerHTML=fn(pp)+' — '+pph.label+'<span class="call-sub">'+pp.costs[idx]+'€/μήνα'+(i===0?' · Φθηνότερος':'')+'</span>';pl.appendChild(a);}
+  });
+
+  document.getElementById('results').classList.add('show');
+  setTimeout(function(){document.getElementById('top3-area').scrollIntoView({behavior:'smooth',block:'start'});},150);
+}
+
+function switchMonth(m){
+  activeMonth=m;
+  green=m==='mar'?greenMar:greenFeb;
+  yellow=m==='mar'?yellowMar:yellowFeb;
+  document.getElementById('tab-mar').classList.toggle('active',m==='mar');
+  document.getElementById('tab-feb').classList.toggle('active',m==='feb');
+  document.getElementById('header-sub').textContent=m==='mar'?'Μάρτιος 2026 · Ελλάδα':'Φεβρουάριος 2026 · Ελλάδα';
+  document.getElementById('intro-note').textContent=m==='mar'?'Τιμές Μαρτίου 2026 · Ενημερώνονται κάθε μήνα':'Τιμές Φεβρουαρίου 2026';
+  resetAll();
+}
+
+function resetAll(){
+  selectedKwh=null;selectedType=null;
+  document.querySelectorAll('.opt').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('step2').classList.add('locked');
+  document.getElementById('results').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
