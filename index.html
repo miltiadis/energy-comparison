@@ -65,7 +65,7 @@ header .sub { color: #93c5fd; font-size: 0.9rem; margin-top: 0.3rem; }
 .dp-penalty { background:#fef2f2; color:#991b1b; }
 .dp-no-penalty { background:#ecfdf5; color:#065f46; }
 .dp-discount { background:#fef9c3; color:#92400e; }
-.dp-full-rate { background:#f5f5f5; color:#888; font-weight:400; text-decoration:line-through; }
+.dp-full-rate { background:#fef2f2; color:#991b1b; font-weight:500; }
 .prov-prog-note { display: block; font-size: 0.7rem; color: #64748b; font-style: italic; margin-top: 0.05rem; word-break: break-word; }
 .top-card .prov-toggle { padding-left: 1rem; }
 .rank-item { margin-top: 0.3rem; }
@@ -358,13 +358,13 @@ var greenMar=[
   {name:'Ελίν',costs:[14,24,33,42,51],prog:'Ειδικό',rates:'9,26λ/kWh ενιαία',pagio:'5€'},
   {name:'EUNICE',costs:[16,26,37,47,58],prog:'Ειδικό',rates:'10,539λ/kWh ενιαία',pagio:'5€'},
   {name:'ΔΕΗ',costs:[18,31,45,60,74],prog:'Πράσινο Γ1',rates:'12,905λ ≤200 kWh · 14,5λ >200 kWh',pagio:'5€',discount:'Εμπρόθεσμη + myΔΕΗ',ratesFull:'14,355λ ≤200 kWh · 16,22λ >200 kWh'},
-  {name:'ΗΡΩΝ',costs:[20,34,49,63,78],prog:'Basic Home',rates:'14,5λ/kWh ενιαία',pagio:'5€',pending:true},
+  {name:'ΗΡΩΝ',costs:[16,28,39,50,61],prog:'Basic Home',rates:'11,252λ/kWh ενιαία',pagio:'5€'},
   {name:'Protergia',costs:[21,37,53,69,85],prog:'Value Special',rates:'15,9λ/kWh ενιαία',pagio:'5€',pending:true},
   {name:'Enerwave',costs:[16,31,47,62,78],prog:'Ειδικό',rates:'15,574λ/kWh ενιαία',pagio:'0€'},
   {name:'NRG',costs:[22,38,55,71,88],prog:'Energy Home',rates:'16,55λ/kWh ενιαία',pagio:'5€',discount:'Συνέπεια',ratesFull:'21,65λ/kWh'},
   {name:'Volton',costs:[22,38,55,71,88],prog:'Ειδικό',rates:'16,623λ/kWh ενιαία',pagio:'4,90€',discount:'Συνέπεια'},
   {name:'ZeniΘ',costs:[22,38,55,71,88],prog:'Ειδικό',rates:'16,555λ/kWh ενιαία',pagio:'5€'},
-  {name:'Φυσ. Αέριο',costs:[24,44,63,83,102],prog:'Οικιακό',rates:'19,4λ/kWh ενιαία',pagio:'5€',pending:true}
+  {name:'Φυσ. Αέριο',costs:[21,37,53,69,85],prog:'Ειδικό',rates:'16,064λ/kWh ενιαία',pagio:'5€',discount:'Συνέπεια'}
 ];
 
 var greenFeb=[
@@ -385,7 +385,7 @@ var yellowMar=[
   {name:'ΔΕΗ',costs:[15,26,36,46,57],prog:'myHome4All',rates:'10,363λ/kWh ≤500 kWh',pagio:'4,90€',months:12,maxPen:0,discount:'Πάγια εντολή',ratesFull:'10,673λ/kWh ≤500 kWh'},
   {name:'Protergia',costs:[17,29,41,53,65],prog:'Value Pulse',rates:'11,9λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0,pending:true},
   {name:'Enerwave',costs:[21,34,47,60,73],prog:'Reward Saver',rates:'12,99λ/kWh ενιαία',pagio:'7,90€',months:12,maxPen:0,discount:'Συνέπεια 7λ'},
-  {name:'ΗΡΩΝ',costs:[20,36,51,66,82],prog:'Yellow One Home',rates:'15,3λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0,pending:true},
+  {name:'ΗΡΩΝ',costs:[13,21,29,36,44],prog:'Yellow One Home',rates:'7,852λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0,discount:'Συνέπεια',ratesFull:'10,192λ/kWh'},
   {name:'NRG',costs:[22,38,55,71,88],prog:'Ειδικό',rates:'16,55λ/kWh ενιαία',pagio:'5€',months:12,maxPen:0,discount:'Συνέπεια',ratesFull:'21,65λ/kWh'}
 ];
 
@@ -417,12 +417,15 @@ function barColor(r){return r<=0.35?'#16a34a':r<=0.55?'#22c55e':r<=0.75?'#f59e0b
 function fn(p){return p.prog?p.name+' '+p.prog:p.name;}
 function detailPills(p,type){
   var h='<span class="detail-pills">';
-  h+='<span class="dp dp-rate">'+p.rates+'</span>';
+  if(p.discount){
+    h+='<span class="dp dp-rate">Με '+p.discount+': '+p.rates+'</span>';
+    if(p.ratesFull)h+='<span class="dp dp-full-rate">Χωρίς έκπτωση: '+p.ratesFull+'</span>';
+  } else {
+    h+='<span class="dp dp-rate">'+p.rates+'</span>';
+  }
   h+='<span class="dp dp-pagio">Πάγιο '+p.pagio+'</span>';
   if(type==='yellow')h+='<span class="dp dp-no-penalty">Χωρίς ρήτρα</span>';
   if(type==='blue')h+='<span class="dp dp-penalty">Ρήτρα ως '+p.maxPen+'€</span>';
-  if(p.discount)h+='<span class="dp dp-discount">Έκπτωση: '+p.discount+'</span>';
-  if(p.ratesFull)h+='<span class="dp dp-full-rate">Χωρίς έκπτ: '+p.ratesFull+'</span>';
   h+='</span>';
   return h;
 }
